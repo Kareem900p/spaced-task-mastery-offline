@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { TaskView } from "@/components/TaskView";
+import { TaskProvider } from "@/contexts/TaskContext";
 
 const TaskManagement = () => {
   const navigate = useNavigate();
@@ -15,7 +16,9 @@ const TaskManagement = () => {
         </Button>
       </div>
 
-      <TaskView />
+      <TaskProvider>
+        <TaskView />
+      </TaskProvider>
     </div>
   );
 };
