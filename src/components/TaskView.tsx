@@ -1,15 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Lock } from "lucide-react";
 import { useTaskContext } from "@/contexts/TaskContext";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface TimeInterval {
   id: string;
   day: number;
   completed: boolean;
+  locked: boolean;
 }
 
 const FIXED_INTERVALS: { day: number; label: string }[] = [
@@ -25,32 +27,64 @@ const FIXED_INTERVALS: { day: number; label: string }[] = [
   { day: 30, label: "اليوم الثلاثون" }
 ];
 
+// تاريخ بداية التطبيق - قمنا باستخدام تاريخ اليوم
+const START_DATE = new Date(2025, 3, 18); // 18 أبريل 2025
+
 export const TaskView = () => {
   const { tasks } = useTaskContext();
-  const [intervals, setIntervals] = useState<TimeInterval[]>(
-    FIXED_INTERVALS.map(interval => ({
+  const { toast } = useToast();
+  const [intervals, setIntervals] = useState<TimeInterval[]>([]);
+  const [currentTask, setCurrentTask] = useState<string>("تطوير واجهة المستخدم");
+  const [currentDescription, setCurrentDescription] = useState<string>("كل يوم خطوة نحو النجاح والتميز");
+  
+  // التحقق من التاريخ وتحديث القفل للأيام
+  useEffect(() => {
+    // احتساب عدد الأيام منذ بداية التطبيق
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - START_DATE.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const updatedIntervals = FIXED_INTERVALS.map(interval => ({
       id: interval.day.toString(),
       day: interval.day,
-      completed: false
-    }))
-  );
+      completed: false,
+      // قفل الأيام التي لم يحن موعدها بعد
+      locked: interval.day > diffDays + 1
+    }));
+    
+    setIntervals(updatedIntervals);
+  }, []);
 
   const completedCount = intervals.filter(i => i.completed).length;
   const completionPercentage = Math.round((completedCount / intervals.length) * 100);
 
   const toggleComplete = (id: string) => {
-    setIntervals(prev => prev.map(i => 
-      i.id === id ? { ...i, completed: !i.completed } : i
-    ));
+    setIntervals(prev => prev.map(i => {
+      // إذا كان اليوم مقفلًا، لا يمكن تعديله
+      if (i.id === id && !i.locked) {
+        return { ...i, completed: !i.completed };
+      }
+      return i;
+    }));
+    
+    // إذا كان اليوم الذي تم النقر عليه مقفلًا، أظهر رسالة
+    const clickedInterval = intervals.find(i => i.id === id);
+    if (clickedInterval?.locked) {
+      toast({
+        title: "هذا اليوم مقفل",
+        description: "لا يمكن تحديد هذا اليوم كمكتمل حتى يحين موعده",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
       <Card className="p-6">
         <div className="flex flex-col items-center">
-          <h2 className="text-lg font-medium mb-2">تطوير واجهة المستخدم</h2>
+          <h2 className="text-lg font-medium mb-2">{currentTask}</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            إنشاء واجهة مستخدم تفاعلية للتطبيق الجديد
+            {currentDescription}
           </p>
           
           <div className="relative w-48 h-48 flex items-center justify-center mb-4">
@@ -80,16 +114,27 @@ export const TaskView = () => {
         {intervals.map(interval => {
           const intervalInfo = FIXED_INTERVALS.find(i => i.day === interval.day);
           return (
-            <Card key={interval.id} className={`p-4 ${interval.completed ? 'border-primary' : ''}`}>
+            <Card key={interval.id} className={`p-4 ${interval.completed ? 'border-primary' : ''} ${interval.locked ? 'bg-gray-100' : ''}`}>
               <div className="flex items-center justify-between">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={interval.completed ? 'text-primary' : 'text-muted-foreground'}
-                  onClick={() => toggleComplete(interval.id)}
-                >
-                  <CheckCircle className="h-5 w-5" />
-                </Button>
+                {interval.locked ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground cursor-not-allowed"
+                    disabled
+                  >
+                    <Lock className="h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={interval.completed ? 'text-primary' : 'text-muted-foreground'}
+                    onClick={() => toggleComplete(interval.id)}
+                  >
+                    <CheckCircle className="h-5 w-5" />
+                  </Button>
+                )}
                 
                 <div className="flex-1 mx-4">
                   <div className="font-medium">
