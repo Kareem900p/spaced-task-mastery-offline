@@ -1,4 +1,5 @@
 
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -106,3 +107,5 @@ export const TaskView = () => {
     </div>
   );
 };
+
+export default TaskView;
