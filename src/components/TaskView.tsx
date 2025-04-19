@@ -14,6 +14,10 @@ export interface TimeInterval {
   locked: boolean;
 }
 
+interface TaskViewProps {
+  taskId?: string | null;
+}
+
 const FIXED_INTERVALS: { day: number; label: string }[] = [
   { day: 1, label: "اليوم الأول" },
   { day: 2, label: "اليوم الثاني" },
@@ -30,15 +34,21 @@ const FIXED_INTERVALS: { day: number; label: string }[] = [
 // تاريخ بداية التطبيق - قمنا باستخدام تاريخ اليوم
 const START_DATE = new Date(2025, 3, 18); // 18 أبريل 2025
 
-export const TaskView = () => {
+export const TaskView: React.FC<TaskViewProps> = ({ taskId }) => {
   const { tasks, getTaskById } = useTaskContext();
   const { toast } = useToast();
   const [intervals, setIntervals] = useState<TimeInterval[]>([]);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(taskId || null);
   
   const selectedTask = selectedTaskId ? getTaskById(selectedTaskId) : null;
   const currentTask = selectedTask?.title || "تطوير واجهة المستخدم";
   const currentDescription = "كل يوم خطوة نحو النجاح والتميز";
+  
+  useEffect(() => {
+    if (taskId) {
+      setSelectedTaskId(taskId);
+    }
+  }, [taskId]);
   
   // التحقق من التاريخ وتحديث القفل للأيام
   useEffect(() => {
