@@ -8,22 +8,10 @@ import { Slider } from "@/components/ui/slider";
 import { 
   BellIcon, 
   MoonIcon, 
-  SunIcon, 
   GlobeIcon, 
-  Trash2Icon,
-  UserIcon,
-  InfoIcon,
   ArrowLeftIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
 const Settings = () => {
@@ -31,7 +19,6 @@ const Settings = () => {
   const { toast } = useToast();
   const [language, setLanguage] = useState<string>('العربية');
   const [notificationTime, setNotificationTime] = useState<number>(15);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<boolean>(true);
   const [autoSave, setAutoSave] = useState<boolean>(true);
@@ -46,13 +33,36 @@ const Settings = () => {
     });
   };
 
-  const handleDeleteConfirm = () => {
-    // هنا يمكن إضافة منطق حذف البيانات
+  const handleDarkModeChange = (checked: boolean) => {
+    setDarkMode(checked);
     toast({
-      title: "تم حذف البيانات",
-      description: "تم حذف جميع البيانات بنجاح",
+      title: checked ? "تم تفعيل الوضع الليلي" : "تم إلغاء الوضع الليلي",
+      description: checked ? "تم تفعيل الوضع الليلي بنجاح" : "تم إلغاء الوضع الليلي بنجاح",
     });
-    setIsDeleteDialogOpen(false);
+  };
+
+  const handleNotificationsChange = (checked: boolean) => {
+    setNotifications(checked);
+    toast({
+      title: checked ? "تم تفعيل الإشعارات" : "تم إلغاء الإشعارات",
+      description: checked ? "سيتم إرسال إشعارات للمهام القادمة" : "لن يتم إرسال إشعارات للمهام القادمة",
+    });
+  };
+
+  const handleAutoSaveChange = (checked: boolean) => {
+    setAutoSave(checked);
+    toast({
+      title: checked ? "تم تفعيل الحفظ التلقائي" : "تم إلغاء الحفظ التلقائي",
+      description: checked ? "سيتم حفظ البيانات تلقائياً" : "لن يتم حفظ البيانات تلقائياً",
+    });
+  };
+
+  const handleAutoUpdateChange = (checked: boolean) => {
+    setAutoUpdate(checked);
+    toast({
+      title: checked ? "تم تفعيل التحديثات التلقائية" : "تم إلغاء التحديثات التلقائية",
+      description: checked ? "سيتم تحديث التطبيق تلقائياً" : "لن يتم تحديث التطبيق تلقائياً",
+    });
   };
 
   return (
@@ -116,27 +126,6 @@ const Settings = () => {
       </Card>
 
       <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-              <Trash2Icon className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <Label className="text-base font-medium">حذف البيانات</Label>
-              <p className="text-sm text-muted-foreground">حذف جميع البيانات من التطبيق</p>
-            </div>
-          </div>
-        </div>
-        <Button 
-          variant="destructive" 
-          className="w-full"
-          onClick={() => setIsDeleteDialogOpen(true)}
-        >
-          حذف جميع البيانات
-        </Button>
-      </Card>
-
-      <Card className="p-4">
         <h3 className="text-base font-medium mb-4">إعدادات إضافية</h3>
         
         <div className="space-y-4">
@@ -145,7 +134,7 @@ const Settings = () => {
               <BellIcon className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm">الإشعارات</span>
             </div>
-            <Switch checked={notifications} onCheckedChange={setNotifications} />
+            <Switch checked={notifications} onCheckedChange={handleNotificationsChange} />
           </div>
           
           <div className="flex items-center justify-between py-2 border-b">
@@ -153,83 +142,20 @@ const Settings = () => {
               <MoonIcon className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm">الوضع الليلي</span>
             </div>
-            <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            <Switch checked={darkMode} onCheckedChange={handleDarkModeChange} />
           </div>
           
           <div className="flex items-center justify-between py-2 border-b">
             <span className="text-sm">حفظ البيانات تلقائياً</span>
-            <Switch checked={autoSave} onCheckedChange={setAutoSave} />
+            <Switch checked={autoSave} onCheckedChange={handleAutoSaveChange} />
           </div>
           
           <div className="flex items-center justify-between py-2">
             <span className="text-sm">تحديثات تلقائية</span>
-            <Switch checked={autoUpdate} onCheckedChange={setAutoUpdate} />
+            <Switch checked={autoUpdate} onCheckedChange={handleAutoUpdateChange} />
           </div>
         </div>
       </Card>
-
-      <Card className="p-4">
-        <h3 className="text-base font-medium mb-3">معلومات الحساب</h3>
-        <div className="flex items-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-            <UserIcon className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h4 className="text-sm font-medium">أحمد محمد</h4>
-            <p className="text-xs text-muted-foreground">ahmed.mohammed@example.com</p>
-          </div>
-        </div>
-        <Button variant="outline" className="w-full">
-          تعديل الملف الشخصي
-        </Button>
-      </Card>
-
-      <Card className="p-4">
-        <h3 className="text-base font-medium mb-3">معلومات التطبيق</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">الإصدار</span>
-            <span className="text-sm">2.5.1</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">آخر تحديث</span>
-            <span className="text-sm">١٨ أبريل ٢٠٢٥</span>
-          </div>
-        </div>
-        <div className="mt-4">
-          <Button variant="outline" className="w-full">
-            التحقق من التحديثات
-          </Button>
-        </div>
-      </Card>
-
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-destructive flex items-center gap-2">
-              <Trash2Icon className="h-5 w-5" />
-              تأكيد الحذف
-            </DialogTitle>
-            <DialogDescription>
-              هل أنت متأكد من حذف جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:justify-center">
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteConfirm}
-            >
-              تأكيد الحذف
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
