@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useTaskContext } from '../contexts/TaskContext';
 import TaskCard from './TaskCard';
 import EmptyState from './EmptyState';
-import { ClockIcon, PlusIcon, Settings } from 'lucide-react';
+import { ClockIcon, PlusIcon, Settings, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TaskForm from './TaskForm';
 
