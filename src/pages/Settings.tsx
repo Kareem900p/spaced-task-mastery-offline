@@ -5,33 +5,21 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { useToast } from "@/hooks/use-toast";
 import { 
   BellIcon, 
   MoonIcon, 
-  GlobeIcon, 
   ArrowLeftIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [language, setLanguage] = useState<string>('العربية');
-  const [notificationTime, setNotificationTime] = useState<number>(15);
-  const [darkMode, setDarkMode] = useState<boolean>(false);
+  
   const [notifications, setNotifications] = useState<boolean>(true);
-  const [autoSave, setAutoSave] = useState<boolean>(true);
-  const [autoUpdate, setAutoUpdate] = useState<boolean>(true);
-
-  const handleLanguageChange = () => {
-    const newLanguage = language === 'العربية' ? 'الإنجليزية' : 'العربية';
-    setLanguage(newLanguage);
-    toast({
-      title: "تم تغيير اللغة",
-      description: `تم تغيير اللغة إلى ${newLanguage}`,
-    });
-  };
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [notificationTime, setNotificationTime] = useState<number>(15);
 
   const handleDarkModeChange = (checked: boolean) => {
     setDarkMode(checked);
@@ -49,22 +37,6 @@ const Settings = () => {
     });
   };
 
-  const handleAutoSaveChange = (checked: boolean) => {
-    setAutoSave(checked);
-    toast({
-      title: checked ? "تم تفعيل الحفظ التلقائي" : "تم إلغاء الحفظ التلقائي",
-      description: checked ? "سيتم حفظ البيانات تلقائياً" : "لن يتم حفظ البيانات تلقائياً",
-    });
-  };
-
-  const handleAutoUpdateChange = (checked: boolean) => {
-    setAutoUpdate(checked);
-    toast({
-      title: checked ? "تم تفعيل التحديثات التلقائية" : "تم إلغاء التحديثات التلقائية",
-      description: checked ? "سيتم تحديث التطبيق تلقائياً" : "لن يتم تحديث التطبيق تلقائياً",
-    });
-  };
-
   return (
     <div className="container py-6 space-y-6" dir="rtl">
       <div className="flex justify-between items-center mb-6">
@@ -75,25 +47,6 @@ const Settings = () => {
         </Button>
       </div>
       
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <GlobeIcon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <Label htmlFor="language" className="text-base font-medium">تغيير لغة التطبيق</Label>
-              <p className="text-sm text-muted-foreground">اللغة الحالية: {language}</p>
-            </div>
-          </div>
-          <Switch 
-            id="language"
-            checked={language === 'الإنجليزية'} 
-            onCheckedChange={handleLanguageChange}
-          />
-        </div>
-      </Card>
-
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -125,35 +78,21 @@ const Settings = () => {
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="text-base font-medium mb-4">إعدادات إضافية</h3>
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2">
+            <BellIcon className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm">الإشعارات</span>
+          </div>
+          <Switch checked={notifications} onCheckedChange={handleNotificationsChange} />
+        </div>
         
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b">
-            <div className="flex items-center gap-2">
-              <BellIcon className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm">الإشعارات</span>
-            </div>
-            <Switch checked={notifications} onCheckedChange={handleNotificationsChange} />
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2">
+            <MoonIcon className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm">الوضع الليلي</span>
           </div>
-          
-          <div className="flex items-center justify-between py-2 border-b">
-            <div className="flex items-center gap-2">
-              <MoonIcon className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm">الوضع الليلي</span>
-            </div>
-            <Switch checked={darkMode} onCheckedChange={handleDarkModeChange} />
-          </div>
-          
-          <div className="flex items-center justify-between py-2 border-b">
-            <span className="text-sm">حفظ البيانات تلقائياً</span>
-            <Switch checked={autoSave} onCheckedChange={handleAutoSaveChange} />
-          </div>
-          
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm">تحديثات تلقائية</span>
-            <Switch checked={autoUpdate} onCheckedChange={handleAutoUpdateChange} />
-          </div>
+          <Switch checked={darkMode} onCheckedChange={handleDarkModeChange} />
         </div>
       </Card>
     </div>
