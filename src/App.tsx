@@ -17,7 +17,7 @@ const App = () => (
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
-          <Route path="/tasks" element={<TaskManagement />} />
+          <Route path="/task/:id" element={<TaskManagement />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Route>

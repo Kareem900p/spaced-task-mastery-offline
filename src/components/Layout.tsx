@@ -1,6 +1,6 @@
 
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { HomeIcon, ListTodoIcon, SettingsIcon, PlusIcon } from "lucide-react";
+import { HomeIcon, ListTodoIcon, SettingsIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Layout = () => {
@@ -9,7 +9,6 @@ const Layout = () => {
   const navigationItems = [
     { path: "/", label: "الرئيسية", icon: HomeIcon },
     { path: "/tasks", label: "المهام", icon: ListTodoIcon },
-    { path: "/add-task", label: "إضافة", icon: PlusIcon },
     { path: "/settings", label: "الإعدادات", icon: SettingsIcon },
   ];
 
@@ -20,7 +19,7 @@ const Layout = () => {
       </main>
 
       <nav className="fixed bottom-0 w-full border-t bg-background">
-        <div className="grid h-16 grid-cols-4">
+        <div className="grid h-16 grid-cols-3">
           {navigationItems.map(({ path, label, icon: Icon }) => {
             const isActive = location.pathname === path;
             return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTaskContext } from '../contexts/TaskContext';
 import TaskCard from './TaskCard';
@@ -8,12 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import TaskForm from './TaskForm';
 
 const TaskList = () => {
-  const { tasks, removeTask, isLoading } = useTaskContext();
+  const { tasks, isLoading } = useTaskContext();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const navigate = useNavigate();
   
   const handleTaskClick = (taskId: string) => {
-    navigate('/tasks');
+    navigate(`/task/${taskId}`);
   };
   
   if (isLoading) {

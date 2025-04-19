@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { TaskProvider } from "@/contexts/TaskContext";
 import { TaskView } from "@/components/TaskView";
 import { Settings } from "lucide-react";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const TaskManagement = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -19,7 +20,7 @@ const TaskManagement = () => {
       </header>
 
       <TaskProvider>
-        <TaskView />
+        <TaskView taskId={id} />
       </TaskProvider>
     </div>
   );
