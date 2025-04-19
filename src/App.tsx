@@ -9,21 +9,24 @@ import TaskManagement from "./pages/TaskManagement";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
+import { TaskProvider } from "./contexts/TaskContext";
 
 const App = () => (
   <TooltipProvider>
     <Toaster />
     <Sonner />
     <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<TaskList />} />
-          <Route path="/task/:id" element={<TaskManagement />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+      <TaskProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/tasks" element={<TaskList />} />
+            <Route path="/task/:id" element={<TaskManagement />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </TaskProvider>
     </BrowserRouter>
   </TooltipProvider>
 );

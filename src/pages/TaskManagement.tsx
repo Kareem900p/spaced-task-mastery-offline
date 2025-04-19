@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { TaskProvider } from "@/contexts/TaskContext";
 import { TaskView } from "@/components/TaskView";
 import { ArrowLeft, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,9 +27,7 @@ const TaskManagement = () => {
         </Button>
       </header>
 
-      <TaskProvider>
-        <TaskView taskId={id} />
-      </TaskProvider>
+      <TaskView taskId={id} />
     </div>
   );
 };
