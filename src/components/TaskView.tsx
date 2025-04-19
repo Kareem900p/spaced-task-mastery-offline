@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock } from "lucide-react";
+import { CheckCircle, Lock, Clock, Calendar } from "lucide-react";
 import { useTaskContext } from "@/contexts/TaskContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -31,11 +31,14 @@ const FIXED_INTERVALS: { day: number; label: string }[] = [
 const START_DATE = new Date(2025, 3, 18); // 18 أبريل 2025
 
 export const TaskView = () => {
-  const { tasks } = useTaskContext();
+  const { tasks, getTaskById } = useTaskContext();
   const { toast } = useToast();
   const [intervals, setIntervals] = useState<TimeInterval[]>([]);
-  const [currentTask, setCurrentTask] = useState<string>("تطوير واجهة المستخدم");
-  const [currentDescription, setCurrentDescription] = useState<string>("كل يوم خطوة نحو النجاح والتميز");
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  
+  const selectedTask = selectedTaskId ? getTaskById(selectedTaskId) : null;
+  const currentTask = selectedTask?.title || "تطوير واجهة المستخدم";
+  const currentDescription = "كل يوم خطوة نحو النجاح والتميز";
   
   // التحقق من التاريخ وتحديث القفل للأيام
   useEffect(() => {
@@ -54,6 +57,13 @@ export const TaskView = () => {
     
     setIntervals(updatedIntervals);
   }, []);
+
+  useEffect(() => {
+    // عند تحميل المكون، اختر أول مهمة إذا كانت موجودة
+    if (tasks.length > 0 && !selectedTaskId) {
+      setSelectedTaskId(tasks[0].id);
+    }
+  }, [tasks, selectedTaskId]);
 
   const completedCount = intervals.filter(i => i.completed).length;
   const completionPercentage = Math.round((completedCount / intervals.length) * 100);
@@ -79,15 +89,15 @@ export const TaskView = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
+    <div className="space-y-6 p-4">
+      <Card className="p-6 shadow-sm">
         <div className="flex flex-col items-center">
           <h2 className="text-lg font-medium mb-2">{currentTask}</h2>
           <p className="text-sm text-muted-foreground mb-4">
             {currentDescription}
           </p>
           
-          <div className="relative w-48 h-48 flex items-center justify-center mb-4">
+          <div className="relative w-36 h-36 flex items-center justify-center mb-4">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <span className="text-3xl font-bold text-primary">

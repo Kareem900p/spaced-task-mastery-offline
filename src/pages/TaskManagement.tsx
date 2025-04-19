@@ -1,20 +1,22 @@
 
+import { useState } from "react";
+import { TaskProvider } from "@/contexts/TaskContext";
+import { TaskView } from "@/components/TaskView";
+import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { TaskView } from "@/components/TaskView";
-import { TaskProvider } from "@/contexts/TaskContext";
 
 const TaskManagement = () => {
   const navigate = useNavigate();
-
+  
   return (
-    <div className="container py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">تفاصيل المهمة</h1>
-        <Button variant="outline" onClick={() => navigate('/')}>
-          العودة
+    <div className="min-h-screen bg-[#F5F7FA]">
+      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold text-[#2E5BFF]">تفاصيل المهمة</h1>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+          <Settings className="h-6 w-6 text-gray-600" />
         </Button>
-      </div>
+      </header>
 
       <TaskProvider>
         <TaskView />
