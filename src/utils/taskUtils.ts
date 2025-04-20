@@ -30,36 +30,7 @@ export const createTask = (
 export const generateReminders = (taskId: string, mainTime: Date): Reminder[] => {
   const reminders: Reminder[] = [];
   
-  // Pre-task reminders (30 minutes before)
-  const reminder30Min = new Date(mainTime.getTime() - 30 * 60 * 1000);
-  reminders.push({
-    id: uuidv4(),
-    taskId,
-    scheduledTime: reminder30Min,
-    type: ReminderType.PRE_TASK_30_MIN,
-    isCompleted: false
-  });
-  
-  // Pre-task reminders (15 minutes before)
-  const reminder15Min = new Date(mainTime.getTime() - 15 * 60 * 1000);
-  reminders.push({
-    id: uuidv4(),
-    taskId,
-    scheduledTime: reminder15Min,
-    type: ReminderType.PRE_TASK_15_MIN,
-    isCompleted: false
-  });
-  
-  // Main time reminder
-  reminders.push({
-    id: uuidv4(),
-    taskId,
-    scheduledTime: new Date(mainTime),
-    type: ReminderType.MAIN,
-    isCompleted: false
-  });
-  
-  // Spaced repetition reminders (after 1, 2, 3, 5, 7, 14, 30 days)
+  // Spaced repetition reminders
   REMINDER_DAYS.forEach(days => {
     const reminderDate = new Date(mainTime);
     reminderDate.setDate(reminderDate.getDate() + days);
@@ -71,7 +42,10 @@ export const generateReminders = (taskId: string, mainTime: Date): Reminder[] =>
       case 3: reminderType = ReminderType.DAY_3; break;
       case 5: reminderType = ReminderType.DAY_5; break;
       case 7: reminderType = ReminderType.DAY_7; break;
-      case 14: reminderType = ReminderType.DAY_14; break;
+      case 10: reminderType = ReminderType.DAY_10; break;
+      case 15: reminderType = ReminderType.DAY_15; break;
+      case 20: reminderType = ReminderType.DAY_20; break;
+      case 25: reminderType = ReminderType.DAY_25; break;
       case 30: reminderType = ReminderType.DAY_30; break;
       default: reminderType = ReminderType.DAY_1;
     }
@@ -130,16 +104,16 @@ export const getUpcomingReminders = (task: Task): Reminder[] => {
  */
 export const getReminderTypeText = (type: ReminderType): string => {
   switch (type) {
-    case ReminderType.PRE_TASK_30_MIN: return "قبل 30 دقيقة";
-    case ReminderType.PRE_TASK_15_MIN: return "قبل 15 دقيقة";
-    case ReminderType.MAIN: return "الموعد الرئيسي";
-    case ReminderType.DAY_1: return "بعد يوم";
-    case ReminderType.DAY_2: return "بعد يومين";
-    case ReminderType.DAY_3: return "بعد 3 أيام";
-    case ReminderType.DAY_5: return "بعد 5 أيام";
-    case ReminderType.DAY_7: return "بعد أسبوع";
-    case ReminderType.DAY_14: return "بعد أسبوعين";
-    case ReminderType.DAY_30: return "بعد شهر";
+    case ReminderType.DAY_1: return "اليوم الأول";
+    case ReminderType.DAY_2: return "اليوم الثاني";
+    case ReminderType.DAY_3: return "اليوم الثالث";
+    case ReminderType.DAY_5: return "اليوم الخامس";
+    case ReminderType.DAY_7: return "اليوم السابع";
+    case ReminderType.DAY_10: return "اليوم العاشر";
+    case ReminderType.DAY_15: return "اليوم الخامس عشر";
+    case ReminderType.DAY_20: return "اليوم العشرون";
+    case ReminderType.DAY_25: return "اليوم الخامس والعشرون";
+    case ReminderType.DAY_30: return "اليوم الثلاثون";
     default: return "";
   }
 };

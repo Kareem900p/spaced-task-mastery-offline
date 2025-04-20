@@ -18,16 +18,16 @@ export interface Reminder {
 }
 
 export enum ReminderType {
-  PRE_TASK_30_MIN = "PRE_TASK_30_MIN",
-  PRE_TASK_15_MIN = "PRE_TASK_15_MIN",
-  MAIN = "MAIN",
   DAY_1 = "DAY_1",
   DAY_2 = "DAY_2", 
   DAY_3 = "DAY_3",
   DAY_5 = "DAY_5",
   DAY_7 = "DAY_7",
-  DAY_14 = "DAY_14",
+  DAY_10 = "DAY_10",
+  DAY_15 = "DAY_15",
+  DAY_20 = "DAY_20",
+  DAY_25 = "DAY_25",
   DAY_30 = "DAY_30"
 }
 
-export const REMINDER_DAYS = [1, 2, 3, 5, 7, 14, 30];
+export const REMINDER_DAYS = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30];

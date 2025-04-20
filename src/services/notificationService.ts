@@ -1,7 +1,6 @@
-
 import { LocalNotifications, ScheduleOptions, PermissionStatus } from '@capacitor/local-notifications';
 import { isOnline } from '@/utils/networkUtils';
-import { Task } from '@/types/task';
+import { Task, ReminderType } from '@/types/task';
 
 /**
  * Request permission to send notifications
@@ -141,23 +140,26 @@ export const scheduleTaskReminders = async (task: Task): Promise<void> => {
   try {
     // Schedule notifications for each reminder
     for (const reminder of task.reminders) {
-      // Skip if the reminder is already completed or past due
-      if (reminder.isCompleted || reminder.scheduledTime < new Date()) {
+      // Skip if the reminder is already completed, past due, or not a spaced repetition reminder
+      if (reminder.isCompleted || 
+          reminder.scheduledTime < new Date() || 
+          ![
+            ReminderType.DAY_1, ReminderType.DAY_2, ReminderType.DAY_3, 
+            ReminderType.DAY_5, ReminderType.DAY_7, ReminderType.DAY_14, 
+            ReminderType.DAY_30
+          ].includes(reminder.type)) {
         continue;
       }
       
       const reminderPrefix = (() => {
         switch (reminder.type) {
-          case 'day1': return 'اليوم الأول:';
-          case 'day2': return 'اليوم الثاني:';
-          case 'day3': return 'اليوم الثالث:';
-          case 'day5': return 'اليوم الخامس:';
-          case 'day7': return 'اليوم السابع:';
-          case 'day10': return 'اليوم العاشر:';
-          case 'day15': return 'اليوم الخامس عشر:';
-          case 'day20': return 'اليوم العشرون:';
-          case 'day25': return 'اليوم الخامس والعشرون:';
-          case 'day30': return 'اليوم الثلاثون:';
+          case ReminderType.DAY_1: return 'اليوم الأول:';
+          case ReminderType.DAY_2: return 'اليوم الثاني:';
+          case ReminderType.DAY_3: return 'اليوم الثالث:';
+          case ReminderType.DAY_5: return 'اليوم الخامس:';
+          case ReminderType.DAY_7: return 'اليوم السابع:';
+          case ReminderType.DAY_14: return 'اليوم الرابع عشر:';
+          case ReminderType.DAY_30: return 'اليوم الثلاثون:';
           default: return 'تذكير:';
         }
       })();

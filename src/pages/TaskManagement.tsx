@@ -3,10 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { TaskView } from "@/components/TaskView";
 import { ArrowLeft, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTaskContext } from "@/contexts/TaskContext";
 
 const TaskManagement = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { getTaskById } = useTaskContext();
+  
+  const task = id ? getTaskById(id) : undefined;
+  const taskTitle = task ? task.title : "الفترات الزمنية للمهمة";
   
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -20,7 +25,7 @@ const TaskManagement = () => {
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </Button>
-          <h1 className="text-xl font-bold text-[#2E5BFF]">الفترات الزمنية للمهمة</h1>
+          <h1 className="text-xl font-bold text-[#2E5BFF]">{taskTitle}</h1>
         </div>
         <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
           <Settings className="h-6 w-6 text-gray-600" />

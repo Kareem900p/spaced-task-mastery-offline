@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, Clock, Calendar, ArrowLeftIcon } from "lucide-react";
+import { CheckCircle, Lock, Calendar, ArrowLeftIcon } from "lucide-react";
 import { useTaskContext } from "@/contexts/TaskContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ReminderType } from "@/types/task";
 
 export interface TimeInterval {
   id: string;
