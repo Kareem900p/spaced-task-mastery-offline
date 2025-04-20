@@ -13,10 +13,10 @@ import { TaskProvider } from "./contexts/TaskContext";
 import Index from "./pages/Index";
 
 const App = () => (
-  <TooltipProvider>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
+  <BrowserRouter>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
       <TaskProvider>
         <Routes>
           <Route element={<Layout />}>
@@ -29,8 +29,8 @@ const App = () => (
           </Route>
         </Routes>
       </TaskProvider>
-    </BrowserRouter>
-  </TooltipProvider>
+    </TooltipProvider>
+  </BrowserRouter>
 );
 
 export default App;

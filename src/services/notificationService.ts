@@ -1,163 +1,103 @@
-
-import { Reminder, Task } from "../types/task";
-import { getFormattedReminderTime } from "../utils/taskUtils";
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { LocalNotifications, ScheduleOptions, PermissionStatus } from '@capacitor/local-notifications';
+import { isOnline } from '@/utils/networkUtils';
 
 /**
- * Checks if notifications are supported
- */
-export const areNotificationsSupported = async (): Promise<boolean> => {
-  try {
-    // Try to use Capacitor for native mobile notifications
-    const { value } = await LocalNotifications.checkPermissions();
-    return value === 'granted';
-  } catch (error) {
-    // Fallback to web notifications
-    return 'Notification' in window;
-  }
-};
-
-/**
- * Requests notification permission
+ * Request permission to send notifications
+ * @returns Promise<boolean> - Whether permission was granted
  */
 export const requestNotificationPermission = async (): Promise<boolean> => {
   try {
-    // Try Capacitor first for mobile
-    const { value } = await LocalNotifications.requestPermissions();
-    return value === 'granted';
+    const permission: PermissionStatus = await LocalNotifications.requestPermissions();
+    return permission.display === 'granted';
   } catch (error) {
-    // Fallback to web notifications
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      return permission === 'granted';
-    }
+    console.error('Error requesting notification permission:', error);
     return false;
   }
 };
 
 /**
- * Shows a notification for a task reminder
+ * Check if notification permission is granted
+ * @returns Promise<boolean> - Whether permission is granted
  */
-export const showTaskNotification = async (task: Task, reminder: Reminder): Promise<void> => {
+export const checkNotificationPermission = async (): Promise<boolean> => {
   try {
-    const time = getFormattedReminderTime(reminder.scheduledTime);
-    const title = "حان وقت المهمة!";
-    const body = `عليك مراجعة: ${task.title} اليوم في الساعة ${time}`;
-    
-    // Try to use Capacitor for native notifications
-    try {
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            title,
-            body,
-            id: parseInt(reminder.id.replace(/-/g, '').substring(0, 8), 16) % 100000,
-            extra: {
-              taskId: task.id,
-              reminderId: reminder.id
-            }
-          }
-        ]
-      });
-    } catch (error) {
-      // Fallback to web notifications
-      if (areNotificationsSupported() && Notification.permission === 'granted') {
-        const notification = new Notification(title, {
-          body,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
-          tag: reminder.id,
-          requireInteraction: true,
-        });
-        
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-        };
-      }
-    }
+    const permission: PermissionStatus = await LocalNotifications.checkPermissions();
+    return permission.display === 'granted';
   } catch (error) {
-    console.error("Error showing notification:", error);
+    console.error('Error checking notification permission:', error);
+    return false;
   }
 };
 
 /**
- * Schedules all reminders for a task
+ * Schedule a local notification
+ * @param id - Unique ID for the notification
+ * @param title - Notification title
+ * @param body - Notification body text
+ * @param scheduledTime - When to show the notification
+ * @returns Promise<void>
  */
-export const scheduleTaskReminders = (task: Task): void => {
-  // Clear any existing reminders for this task
-  clearTaskReminders(task.id);
-  
-  const now = new Date();
-  
-  // Schedule new reminders
-  task.reminders.forEach(reminder => {
-    if (
-      !reminder.isCompleted && 
-      !task.completedReminders.includes(reminder.id) && 
-      reminder.scheduledTime > now
-    ) {
-      const timeUntilReminder = reminder.scheduledTime.getTime() - now.getTime();
-      
-      // Only schedule if it's in the future
-      if (timeUntilReminder > 0) {
-        const timerId = setTimeout(() => {
-          showTaskNotification(task, reminder);
-        }, timeUntilReminder);
-        
-        // Store the timer ID so we can cancel it later if needed
-        storeReminderId(reminder.id, timerId);
-      }
+export const scheduleNotification = async (
+  id: number,
+  title: string,
+  body: string,
+  scheduledTime: Date
+): Promise<void> => {
+  if (!isOnline()) {
+    console.warn('Device is offline, notification scheduling may be delayed');
+  }
+
+  try {
+    const hasPermission = await checkNotificationPermission();
+    if (!hasPermission) {
+      console.warn('Notification permission not granted');
+      return;
     }
-  });
-};
 
-// Store timer IDs so we can cancel them
-const reminderTimers: Record<string, NodeJS.Timeout> = {};
-
-/**
- * Stores a reminder timer ID
- */
-const storeReminderId = (reminderId: string, timerId: NodeJS.Timeout): void => {
-  reminderTimers[reminderId] = timerId;
-};
-
-/**
- * Clears all reminders for a task
- */
-export const clearTaskReminders = (taskId: string): void => {
-  Object.entries(reminderTimers).forEach(([reminderId, timerId]) => {
-    if (reminderId.startsWith(taskId)) {
-      clearTimeout(timerId);
-      delete reminderTimers[reminderId];
-    }
-  });
-};
-
-/**
- * Initializes the notification system and schedules all reminders
- */
-export const initializeNotifications = async (tasks: Task[]): Promise<void> => {
-  const hasPermission = await requestNotificationPermission();
-  
-  if (hasPermission) {
-    tasks.forEach(task => {
-      scheduleTaskReminders(task);
-    });
-    
-    // Setup Capacitor local notification click handler
-    try {
-      LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
-        const taskId = notification.notification.extra?.taskId;
-        const reminderId = notification.notification.extra?.reminderId;
-        
-        if (taskId && reminderId) {
-          // You would implement some navigation here
-          console.log(`Notification clicked for task ${taskId} and reminder ${reminderId}`);
+    const options: ScheduleOptions = {
+      notifications: [
+        {
+          id,
+          title,
+          body,
+          schedule: { at: scheduledTime },
+          sound: 'beep.wav',
+          smallIcon: 'ic_stat_icon_config_sample',
+          iconColor: '#2E5BFF'
         }
-      });
-    } catch (error) {
-      console.error("Error setting up notification listener:", error);
-    }
+      ]
+    };
+
+    await LocalNotifications.schedule(options);
+    console.log(`Notification scheduled for ${scheduledTime.toLocaleString()}`);
+  } catch (error) {
+    console.error('Error scheduling notification:', error);
+  }
+};
+
+/**
+ * Cancel a scheduled notification
+ * @param id - ID of the notification to cancel
+ * @returns Promise<void>
+ */
+export const cancelNotification = async (id: number): Promise<void> => {
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id }] });
+    console.log(`Notification ${id} cancelled`);
+  } catch (error) {
+    console.error('Error cancelling notification:', error);
+  }
+};
+
+/**
+ * Cancel all scheduled notifications
+ * @returns Promise<void>
+ */
+export const cancelAllNotifications = async (): Promise<void> => {
+  try {
+    await LocalNotifications.cancelAll();
+    console.log('All notifications cancelled');
+  } catch (error) {
+    console.error('Error cancelling all notifications:', error);
   }
 };
