@@ -1,3 +1,4 @@
+
 import { LocalNotifications, ScheduleOptions, PermissionStatus } from '@capacitor/local-notifications';
 import { isOnline } from '@/utils/networkUtils';
 import { Task, ReminderType } from '@/types/task';
@@ -145,7 +146,8 @@ export const scheduleTaskReminders = async (task: Task): Promise<void> => {
           reminder.scheduledTime < new Date() || 
           ![
             ReminderType.DAY_1, ReminderType.DAY_2, ReminderType.DAY_3, 
-            ReminderType.DAY_5, ReminderType.DAY_7, ReminderType.DAY_14, 
+            ReminderType.DAY_5, ReminderType.DAY_7, ReminderType.DAY_10, 
+            ReminderType.DAY_15, ReminderType.DAY_20, ReminderType.DAY_25,
             ReminderType.DAY_30
           ].includes(reminder.type)) {
         continue;
@@ -158,7 +160,10 @@ export const scheduleTaskReminders = async (task: Task): Promise<void> => {
           case ReminderType.DAY_3: return 'اليوم الثالث:';
           case ReminderType.DAY_5: return 'اليوم الخامس:';
           case ReminderType.DAY_7: return 'اليوم السابع:';
-          case ReminderType.DAY_14: return 'اليوم الرابع عشر:';
+          case ReminderType.DAY_10: return 'اليوم العاشر:';
+          case ReminderType.DAY_15: return 'اليوم الخامس عشر:';
+          case ReminderType.DAY_20: return 'اليوم العشرون:';
+          case ReminderType.DAY_25: return 'اليوم الخامس والعشرون:';
           case ReminderType.DAY_30: return 'اليوم الثلاثون:';
           default: return 'تذكير:';
         }
