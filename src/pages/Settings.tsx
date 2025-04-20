@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   BellIcon, 
   MoonIcon, 
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  SunIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,12 +18,40 @@ const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [notifications, setNotifications] = useState<boolean>(true);
-  const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [notificationTime, setNotificationTime] = useState<number>(15);
+  // Get settings from localStorage or use defaults
+  const getInitialSettings = () => {
+    try {
+      const savedSettings = localStorage.getItem('app_settings');
+      if (savedSettings) {
+        return JSON.parse(savedSettings);
+      }
+    } catch (error) {
+      console.error("Error loading settings:", error);
+    }
+    return {
+      notifications: true,
+      darkMode: false,
+      notificationTime: 15
+    };
+  };
+  
+  const [settings, setSettings] = useState(getInitialSettings);
+  
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('app_settings', JSON.stringify(settings));
+  }, [settings]);
 
   const handleDarkModeChange = (checked: boolean) => {
-    setDarkMode(checked);
+    setSettings(prev => ({ ...prev, darkMode: checked }));
+    
+    // Apply dark mode to document
+    if (checked) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
     toast({
       title: checked ? "تم تفعيل الوضع الليلي" : "تم إلغاء الوضع الليلي",
       description: checked ? "تم تفعيل الوضع الليلي بنجاح" : "تم إلغاء الوضع الليلي بنجاح",
@@ -30,12 +59,26 @@ const Settings = () => {
   };
 
   const handleNotificationsChange = (checked: boolean) => {
-    setNotifications(checked);
+    setSettings(prev => ({ ...prev, notifications: checked }));
+    
     toast({
       title: checked ? "تم تفعيل الإشعارات" : "تم إلغاء الإشعارات",
       description: checked ? "سيتم إرسال إشعارات للمهام القادمة" : "لن يتم إرسال إشعارات للمهام القادمة",
     });
   };
+  
+  const handleNotificationTimeChange = (value: number[]) => {
+    setSettings(prev => ({ ...prev, notificationTime: value[0] }));
+  };
+
+  // Apply dark mode on initial load
+  useEffect(() => {
+    if (settings.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   return (
     <div className="container py-6 space-y-6" dir="rtl">
@@ -64,15 +107,15 @@ const Settings = () => {
             <span className="text-sm text-muted-foreground">٣٠ دقيقة</span>
           </div>
           <Slider
-            defaultValue={[notificationTime]}
+            defaultValue={[settings.notificationTime]}
             max={30}
             min={15}
             step={5}
-            onValueChange={(value) => setNotificationTime(value[0])}
+            onValueChange={handleNotificationTimeChange}
           />
           <div className="mt-2 text-center">
             <span className="text-sm font-medium text-primary">
-              التنبيه قبل {notificationTime} دقيقة من الموعد
+              التنبيه قبل {settings.notificationTime} دقيقة من الموعد
             </span>
           </div>
         </div>
@@ -84,15 +127,25 @@ const Settings = () => {
             <BellIcon className="h-5 w-5 text-muted-foreground" />
             <span className="text-sm">الإشعارات</span>
           </div>
-          <Switch checked={notifications} onCheckedChange={handleNotificationsChange} />
+          <Switch 
+            checked={settings.notifications} 
+            onCheckedChange={handleNotificationsChange} 
+          />
         </div>
         
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-2">
-            <MoonIcon className="h-5 w-5 text-muted-foreground" />
+            {settings.darkMode ? (
+              <MoonIcon className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <SunIcon className="h-5 w-5 text-muted-foreground" />
+            )}
             <span className="text-sm">الوضع الليلي</span>
           </div>
-          <Switch checked={darkMode} onCheckedChange={handleDarkModeChange} />
+          <Switch 
+            checked={settings.darkMode} 
+            onCheckedChange={handleDarkModeChange} 
+          />
         </div>
       </Card>
     </div>

@@ -10,6 +10,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import { TaskProvider } from "./contexts/TaskContext";
+import Index from "./pages/Index";
 
 const App = () => (
   <TooltipProvider>
@@ -19,7 +20,8 @@ const App = () => (
       <TaskProvider>
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/tasks" element={<TaskList />} />
             <Route path="/task/:id" element={<TaskManagement />} />
             <Route path="/settings" element={<Settings />} />

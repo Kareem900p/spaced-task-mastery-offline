@@ -1,27 +1,36 @@
 
 import { Reminder, Task } from "../types/task";
 import { getFormattedReminderTime } from "../utils/taskUtils";
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 /**
- * Checks if notifications are supported and permitted
+ * Checks if notifications are supported
  */
-export const areNotificationsSupported = (): boolean => {
-  return 'Notification' in window;
+export const areNotificationsSupported = async (): Promise<boolean> => {
+  try {
+    // Try to use Capacitor for native mobile notifications
+    const { value } = await LocalNotifications.checkPermissions();
+    return value === 'granted';
+  } catch (error) {
+    // Fallback to web notifications
+    return 'Notification' in window;
+  }
 };
 
 /**
  * Requests notification permission
  */
 export const requestNotificationPermission = async (): Promise<boolean> => {
-  if (!areNotificationsSupported()) {
-    return false;
-  }
-  
   try {
-    const permission = await Notification.requestPermission();
-    return permission === 'granted';
+    // Try Capacitor first for mobile
+    const { value } = await LocalNotifications.requestPermissions();
+    return value === 'granted';
   } catch (error) {
-    console.error("Error requesting notification permission:", error);
+    // Fallback to web notifications
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      return permission === 'granted';
+    }
     return false;
   }
 };
@@ -29,29 +38,44 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 /**
  * Shows a notification for a task reminder
  */
-export const showTaskNotification = (task: Task, reminder: Reminder): void => {
-  if (!areNotificationsSupported() || Notification.permission !== 'granted') {
-    return;
-  }
-  
+export const showTaskNotification = async (task: Task, reminder: Reminder): Promise<void> => {
   try {
     const time = getFormattedReminderTime(reminder.scheduledTime);
     const title = "حان وقت المهمة!";
     const body = `عليك مراجعة: ${task.title} اليوم في الساعة ${time}`;
     
-    const notification = new Notification(title, {
-      body,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: reminder.id, // Ensures we don't show duplicate notifications
-      requireInteraction: true, // Notification remains until user interacts with it
-    });
-    
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
-    
+    // Try to use Capacitor for native notifications
+    try {
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title,
+            body,
+            id: parseInt(reminder.id.replace(/-/g, '').substring(0, 8), 16) % 100000,
+            extra: {
+              taskId: task.id,
+              reminderId: reminder.id
+            }
+          }
+        ]
+      });
+    } catch (error) {
+      // Fallback to web notifications
+      if (areNotificationsSupported() && Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+          body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          tag: reminder.id,
+          requireInteraction: true,
+        });
+        
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
+      }
+    }
   } catch (error) {
     console.error("Error showing notification:", error);
   }
@@ -120,5 +144,20 @@ export const initializeNotifications = async (tasks: Task[]): Promise<void> => {
     tasks.forEach(task => {
       scheduleTaskReminders(task);
     });
+    
+    // Setup Capacitor local notification click handler
+    try {
+      LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
+        const taskId = notification.notification.extra?.taskId;
+        const reminderId = notification.notification.extra?.reminderId;
+        
+        if (taskId && reminderId) {
+          // You would implement some navigation here
+          console.log(`Notification clicked for task ${taskId} and reminder ${reminderId}`);
+        }
+      });
+    } catch (error) {
+      console.error("Error setting up notification listener:", error);
+    }
   }
 };

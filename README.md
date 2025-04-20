@@ -1,73 +1,63 @@
-# Welcome to your Lovable project
 
-## Project info
+# منظم المهام المتباعدة
 
-**URL**: https://lovable.dev/projects/613cc1ad-bfbd-470c-a814-68b062497fe6
+تطبيق لإدارة المهام باستخدام نظام التكرار المتباعد للمساعدة في الحفظ والمراجعة.
 
-## How can I edit this code?
+## المميزات
 
-There are several ways of editing your application.
+- إنشاء وإدارة المهام
+- جدولة التذكيرات التلقائية
+- إشعارات المراجعة المتباعدة
+- يعمل بدون اتصال بالإنترنت
+- دعم وضع الظلام
+- يعمل على الويب، الأندرويد، والآيفون
 
-**Use Lovable**
+## متطلبات النظام
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/613cc1ad-bfbd-470c-a814-68b062497fe6) and start prompting.
+- Node.js 14 أو أحدث
+- NPM 6 أو أحدث
+- لتطبيقات الموبايل: Android Studio و/أو Xcode
 
-Changes made via Lovable will be committed automatically to this repo.
+## تثبيت واستخدام التطبيق
 
-**Use your preferred IDE**
+1. قم بتنزيل المشروع من GitHub واستخدم الأمر `npm install` لتثبيت الاعتماديات.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. لتشغيل التطبيق في المتصفح استخدم `npm run dev`.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. لإنشاء نسخة للإنتاج استخدم `npm run build`.
 
-Follow these steps:
+### إنشاء تطبيق للموبايل
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+#### الأندرويد:
+```bash
+# إضافة منصة الأندرويد
+npx cap add android
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# مزامنة التطبيق
+npm run build
+npx cap sync android
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# فتح المشروع في Android Studio
+npx cap open android
 ```
 
-**Edit a file directly in GitHub**
+#### آيفون:
+```bash
+# إضافة منصة iOS
+npx cap add ios
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# مزامنة التطبيق
+npm run build
+npx cap sync ios
 
-**Use GitHub Codespaces**
+# فتح المشروع في Xcode
+npx cap open ios
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## الاستخدام بدون اتصال بالإنترنت
 
-## What technologies are used for this project?
+التطبيق مصمم للعمل بشكل كامل بدون اتصال بالإنترنت. جميع البيانات تُخزن محليًا على الجهاز.
 
-This project is built with:
+## المساهمة
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/613cc1ad-bfbd-470c-a814-68b062497fe6) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+نرحب بالمساهمات والاقتراحات. يرجى إنشاء "issue" أو "pull request" على GitHub.
